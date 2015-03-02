@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,7 @@ namespace JoinMergeImage
         private void btnExecute_Click(object sender, EventArgs e)
         {
             //Tạo thư mục tmp
+            string pathTmp = txtPath.Text + @"\tmp";
             if (!Directory.Exists(txtPath.Text + @"\tmp"))
             {
                 Directory.CreateDirectory(txtPath.Text + @"\tmp");
@@ -40,7 +42,25 @@ namespace JoinMergeImage
             
             foreach (string fileName in paths)
             {
+                ResizeImage(fileName, pathTmp);
+            }
+        }
 
+        private void ResizeImage(string fileName, string pathTmp)
+        {
+            string[] name = fileName.Split('\\');
+            Rectangle rec=new Rectangle(0, 0, (int)numWidth.Value, (int)numHeight.Value);
+            using (Bitmap bm = new Bitmap((int)numWidth.Value, (int)numHeight.Value))
+            {
+                Graphics gp = Graphics.FromImage(bm);
+                using(Image img=Image.FromFile(fileName))
+                {
+                    bm.SetResolution(img.HorizontalResolution, img.VerticalResolution);
+                    gp.DrawImage(img,0,0);
+                    bm.MakeTransparent();
+                    bm.Save(pathTmp + @"\"+name[name.Length-1], ImageFormat.Png);
+                
+                }
             }
         }
     }
